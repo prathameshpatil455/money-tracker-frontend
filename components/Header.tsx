@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, SIZES, FONTS } from '@/constants/theme';
-import { Bell, Search } from 'lucide-react-native';
+import { COLORS, FONTS, SIZES } from "@/constants/theme";
+import { Bell, Search } from "lucide-react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface HeaderProps {
   title: string;
@@ -25,9 +25,9 @@ const Header = ({ title }: HeaderProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: SIZES.padding,
     paddingVertical: SIZES.padding * 0.75,
   },
@@ -36,16 +36,16 @@ const styles = StyleSheet.create({
     color: COLORS.black,
   },
   actionsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     backgroundColor: COLORS.white,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: 12,
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   notificationBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
     width: 8,

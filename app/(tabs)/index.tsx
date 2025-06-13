@@ -13,7 +13,6 @@ import {
   View,
 } from "react-native";
 import { LineChart, PieChart } from "react-native-chart-kit";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -72,7 +71,7 @@ const Dashboard = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Header title="Dashboard" />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -221,7 +220,7 @@ const Dashboard = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -249,6 +248,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingBottom: 80,
   },
   scrollContent: {
     padding: SIZES.padding,

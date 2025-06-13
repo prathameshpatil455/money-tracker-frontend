@@ -1,6 +1,15 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { COLORS, SIZES, FONTS } from '@/constants/theme';
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { COLORS, FONTS } from "@/constants/theme";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 interface Category {
   value: string;
@@ -15,10 +24,10 @@ interface CategorySelectionProps {
   onSelectCategory: (category: string) => void;
 }
 
-const CategorySelection = ({ 
-  categories, 
-  selectedCategory, 
-  onSelectCategory 
+const CategorySelection = ({
+  categories,
+  selectedCategory,
+  onSelectCategory,
 }: CategorySelectionProps) => {
   return (
     <ScrollView
@@ -28,15 +37,15 @@ const CategorySelection = ({
     >
       {categories.map((category) => {
         const isSelected = category.value === selectedCategory;
-        
+
         // Create animated styles for the selected indicator
         const animatedStyles = useAnimatedStyle(() => {
           return {
             opacity: withTiming(isSelected ? 1 : 0, { duration: 150 }),
             transform: [
-              { 
-                scale: withTiming(isSelected ? 1 : 0.8, { duration: 200 }) 
-              }
+              {
+                scale: withTiming(isSelected ? 1 : 0.8, { duration: 200 }),
+              },
             ],
           };
         });
@@ -48,27 +57,34 @@ const CategorySelection = ({
             onPress={() => onSelectCategory(category.value)}
             activeOpacity={0.7}
           >
-            <View 
+            <View
               style={[
                 styles.iconContainer,
-                { borderColor: isSelected ? category.color || COLORS.primary : 'transparent' }
+                {
+                  borderColor: isSelected
+                    ? category.color || COLORS.primary
+                    : "transparent",
+                },
               ]}
             >
               {category.icon}
               {isSelected && (
-                <Animated.View 
+                <Animated.View
                   style={[
                     styles.selectedIndicator,
                     { backgroundColor: category.color || COLORS.primary },
-                    animatedStyles
-                  ]} 
+                    animatedStyles,
+                  ]}
                 />
               )}
             </View>
-            <Text 
+            <Text
               style={[
                 styles.categoryLabel,
-                isSelected && { color: COLORS.black, fontFamily: 'Inter-Medium' }
+                isSelected && {
+                  color: COLORS.black,
+                  fontFamily: "Inter-Medium",
+                },
               ]}
               numberOfLines={1}
             >
@@ -83,10 +99,10 @@ const CategorySelection = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   categoryItem: {
-    alignItems: 'center',
+    alignItems: "center",
     marginRight: 16,
     width: 72,
   },
@@ -94,8 +110,8 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: COLORS.white,
     marginBottom: 8,
     borderWidth: 2,
@@ -106,7 +122,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedIndicator: {
-    position: 'absolute',
+    position: "absolute",
     bottom: -2,
     width: 16,
     height: 4,
@@ -115,7 +131,7 @@ const styles = StyleSheet.create({
   categoryLabel: {
     ...FONTS.body4,
     color: COLORS.grayDark,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 
