@@ -1,72 +1,88 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '@/components/Header';
-import { COLORS, SIZES, FONTS } from '@/constants/theme';
-import { User, Settings, CircleHelp as HelpCircle, Bell, LogOut, CreditCard, Shield, ChevronRight, Moon } from 'lucide-react-native';
+import Header from "@/components/Header";
+import { COLORS, FONTS, SIZES } from "@/constants/theme";
+import {
+  Bell,
+  ChevronRight,
+  CreditCard,
+  CircleHelp as HelpCircle,
+  LogOut,
+  Moon,
+  Settings,
+  Shield,
+  User,
+} from "lucide-react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const ProfileScreen = () => {
   const profileSections = [
     {
-      title: 'Account',
+      title: "Account",
       items: [
-        { 
-          id: 'personal', 
-          title: 'Personal Information', 
+        {
+          id: "personal",
+          title: "Personal Information",
           icon: <User size={20} color={COLORS.grayDark} />,
-          action: () => console.log('Personal Information')
+          action: () => console.log("Personal Information"),
         },
-        { 
-          id: 'payment', 
-          title: 'Payment Methods', 
+        {
+          id: "payment",
+          title: "Payment Methods",
           icon: <CreditCard size={20} color={COLORS.grayDark} />,
-          action: () => console.log('Payment Methods')
+          action: () => console.log("Payment Methods"),
         },
-        { 
-          id: 'security', 
-          title: 'Security', 
+        {
+          id: "security",
+          title: "Security",
           icon: <Shield size={20} color={COLORS.grayDark} />,
-          action: () => console.log('Security')
+          action: () => console.log("Security"),
         },
-      ]
+      ],
     },
     {
-      title: 'Preferences',
+      title: "Preferences",
       items: [
-        { 
-          id: 'notifications', 
-          title: 'Notifications', 
+        {
+          id: "notifications",
+          title: "Notifications",
           icon: <Bell size={20} color={COLORS.grayDark} />,
-          action: () => console.log('Notifications')
+          action: () => console.log("Notifications"),
         },
-        { 
-          id: 'appearance', 
-          title: 'Appearance', 
+        {
+          id: "appearance",
+          title: "Appearance",
           icon: <Moon size={20} color={COLORS.grayDark} />,
-          action: () => console.log('Appearance')
+          action: () => console.log("Appearance"),
         },
-      ]
+      ],
     },
     {
-      title: 'Support',
+      title: "Support",
       items: [
-        { 
-          id: 'help', 
-          title: 'Help Center', 
+        {
+          id: "help",
+          title: "Help Center",
           icon: <HelpCircle size={20} color={COLORS.grayDark} />,
-          action: () => console.log('Help Center')
+          action: () => console.log("Help Center"),
         },
-        { 
-          id: 'settings', 
-          title: 'App Settings', 
+        {
+          id: "settings",
+          title: "App Settings",
           icon: <Settings size={20} color={COLORS.grayDark} />,
-          action: () => console.log('App Settings')
+          action: () => console.log("App Settings"),
         },
-      ]
-    }
+      ],
+    },
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Header title="Profile" />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -74,9 +90,11 @@ const ProfileScreen = () => {
       >
         {/* Profile Card */}
         <View style={styles.profileCard}>
-          <Image 
-            source={{ uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300' }} 
-            style={styles.profileImage} 
+          <Image
+            source={{
+              uri: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300",
+            }}
+            style={styles.profileImage}
           />
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>John Doe</Text>
@@ -111,11 +129,12 @@ const ProfileScreen = () => {
             <Text style={styles.sectionTitle}>{section.title}</Text>
             <View style={styles.sectionContent}>
               {section.items.map((item, index) => (
-                <TouchableOpacity 
-                  key={item.id} 
+                <TouchableOpacity
+                  key={item.id}
                   style={[
                     styles.sectionItem,
-                    index === section.items.length - 1 && styles.sectionItemLast
+                    index === section.items.length - 1 &&
+                      styles.sectionItemLast,
                   ]}
                   onPress={item.action}
                 >
@@ -139,7 +158,7 @@ const ProfileScreen = () => {
         {/* App Version */}
         <Text style={styles.versionText}>App Version 1.0.0</Text>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -153,8 +172,8 @@ const styles = StyleSheet.create({
     paddingBottom: SIZES.padding * 2,
   },
   profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.white,
     borderRadius: SIZES.radius,
     padding: SIZES.padding,
@@ -192,10 +211,10 @@ const styles = StyleSheet.create({
   editButtonText: {
     ...FONTS.body4,
     color: COLORS.primary,
-    fontFamily: 'Inter-Medium',
+    fontFamily: "Inter-Medium",
   },
   statsCard: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: COLORS.white,
     borderRadius: SIZES.radius,
     padding: SIZES.padding,
@@ -208,7 +227,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     ...FONTS.h3,
@@ -221,7 +240,7 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: '100%',
+    height: "100%",
     backgroundColor: COLORS.gray,
   },
   section: {
@@ -235,7 +254,7 @@ const styles = StyleSheet.create({
   sectionContent: {
     backgroundColor: COLORS.white,
     borderRadius: SIZES.radius,
-    overflow: 'hidden',
+    overflow: "hidden",
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -243,9 +262,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   sectionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: SIZES.padding,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.lightGray,
@@ -254,8 +273,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   sectionItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   sectionItemText: {
     ...FONTS.body3,
@@ -263,9 +282,9 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: COLORS.white,
     borderRadius: SIZES.radius,
     padding: SIZES.padding,
@@ -281,12 +300,12 @@ const styles = StyleSheet.create({
     ...FONTS.body3,
     color: COLORS.expense,
     marginLeft: 8,
-    fontFamily: 'Inter-Medium',
+    fontFamily: "Inter-Medium",
   },
   versionText: {
     ...FONTS.body4,
     color: COLORS.grayDark,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: SIZES.padding,
   },
 });

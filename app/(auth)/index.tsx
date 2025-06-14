@@ -1,12 +1,14 @@
 import { COLORS } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -21,10 +23,31 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
+  const { login, error, clearError } = useAuthStore();
 
-  const handleLogin = () => {
-    router.push("/(auth)/signup");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter both email and password");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      clearError();
+      const success = await login({ email, password });
+
+      if (success) {
+        router.replace("/(tabs)");
+      } else {
+        console.log(error, "error");
+        Alert.alert("Login Failed", "Invalid email or password");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      Alert.alert("Error", "An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -113,7 +136,7 @@ export default function LoginScreen() {
 
             {/* footer */}
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Don't have an account?</Text>
+              <Text style={styles.footerText}>Don&apos;t have an account?</Text>
               <Link href="/(auth)/signup" asChild>
                 <TouchableOpacity>
                   <Text style={styles.link}>Sign up</Text>
@@ -127,34 +150,10 @@ export default function LoginScreen() {
   );
 }
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 24,
-//     justifyContent: "center",
-//     backgroundColor: "#fff",
-//   },
-//   title: {
-//     fontSize: 28,
-//     fontWeight: "bold",
-//     marginBottom: 24,
-//     textAlign: "center",
-//   },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: "#ccc",
-//     borderRadius: 8,
-//     padding: 12,
-//     marginBottom: 10,
-//   },
-//   error: {
-//     color: "red",
-//     marginBottom: 8,
-//     fontSize: 12,
-//   },
-//   link: {
-//     color: "#1e90ff",
-//     marginTop: 16,
-//     textAlign: "center",
-//   },
-// });
+const localStyles = StyleSheet.create({
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+});

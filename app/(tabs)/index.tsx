@@ -2,7 +2,12 @@ import Header from "@/components/Header";
 import TransactionItem from "@/components/TransactionItem";
 import { COLORS, FONTS, SIZES } from "@/constants/theme";
 import { mockTransactions } from "@/data/mockData";
-import { ChevronRight, TrendingDown, TrendingUp } from "lucide-react-native";
+import {
+  ChevronRight,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+} from "lucide-react-native";
 import { useState } from "react";
 import {
   Dimensions,
@@ -12,9 +17,23 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LineChart, PieChart } from "react-native-chart-kit";
+import { LineChart } from "react-native-chart-kit";
+import { PieChart } from "react-native-svg-charts";
 
 const screenWidth = Dimensions.get("window").width;
+
+interface ChartDataItem {
+  name: string;
+  amount: number;
+  color: string;
+}
+
+interface PieDataItem {
+  value: number;
+  svg: { fill: string };
+  key: string;
+  arc: { cornerRadius: number };
+}
 
 const Dashboard = () => {
   const [activeTimeframe, setActiveTimeframe] = useState("week");
@@ -36,7 +55,7 @@ const Dashboard = () => {
   // Pie chart data for expense categories
   const expensesByCategory = mockTransactions
     .filter((t) => t.type === "expense")
-    .reduce((acc, curr) => {
+    .reduce((acc: ChartDataItem[], curr) => {
       const existingCategory = acc.find((item) => item.name === curr.category);
       if (existingCategory) {
         existingCategory.amount += curr.amount;
@@ -45,12 +64,29 @@ const Dashboard = () => {
           name: curr.category,
           amount: curr.amount,
           color: getRandomColor(curr.category),
-          legendFontColor: "#7F7F7F",
-          legendFontSize: 12,
         });
       }
       return acc;
     }, []);
+
+  // Sort categories by amount for better visualization
+  const sortedExpenses = [...expensesByCategory].sort(
+    (a, b) => b.amount - a.amount
+  );
+
+  // Calculate total for percentage
+  const totalExpense = sortedExpenses.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+
+  // Format data for PieChart
+  const pieData: PieDataItem[] = sortedExpenses.map((item) => ({
+    value: item.amount,
+    svg: { fill: item.color },
+    key: item.name,
+    arc: { cornerRadius: 4 },
+  }));
 
   // Line chart data
   const lineChartData = {
@@ -79,125 +115,132 @@ const Dashboard = () => {
       >
         {/* Balance Overview */}
         <View style={styles.balanceCard}>
-          <Text style={styles.balanceTitle}>Current Balance</Text>
-          <Text style={styles.balanceAmount}>${balance.toFixed(2)}</Text>
+          <View style={styles.balanceHeader}>
+            <View style={styles.balanceTitleContainer}>
+              <Wallet size={24} color={COLORS.primary} />
+              <Text style={styles.balanceTitle}>Total Balance</Text>
+            </View>
+            <Text style={styles.balanceAmount}>${balance.toFixed(2)}</Text>
+          </View>
           <View style={styles.incomeExpenseRow}>
             <View style={styles.incomeContainer}>
-              <TrendingUp size={16} color={COLORS.success} />
-              <Text style={styles.incomeText}>Income</Text>
-              <Text style={[styles.amountText, { color: COLORS.success }]}>
-                ${totalIncome.toFixed(2)}
-              </Text>
+              <View
+                style={[
+                  styles.iconContainer,
+                  { backgroundColor: COLORS.success + "20" },
+                ]}
+              >
+                <TrendingUp size={20} color={COLORS.success} />
+              </View>
+              <View style={styles.amountContainer}>
+                <Text style={styles.amountLabel}>Income</Text>
+                <Text style={[styles.amountText, { color: COLORS.success }]}>
+                  ${totalIncome.toFixed(2)}
+                </Text>
+              </View>
             </View>
             <View style={styles.divider} />
             <View style={styles.expenseContainer}>
-              <TrendingDown size={16} color={COLORS.expense} />
-              <Text style={styles.expenseText}>Expense</Text>
-              <Text style={[styles.amountText, { color: COLORS.expense }]}>
-                ${totalExpenses.toFixed(2)}
-              </Text>
+              <View
+                style={[
+                  styles.iconContainer,
+                  { backgroundColor: COLORS.expense + "20" },
+                ]}
+              >
+                <TrendingDown size={20} color={COLORS.expense} />
+              </View>
+              <View style={styles.amountContainer}>
+                <Text style={styles.amountLabel}>Expense</Text>
+                <Text style={[styles.amountText, { color: COLORS.expense }]}>
+                  ${totalExpenses.toFixed(2)}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
 
         {/* Spending Overview */}
         <View style={styles.chartSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Spending Overview</Text>
+          <Text style={styles.sectionTitle}>Spending Overview</Text>
+          <View style={styles.chartContainer}>
+            <LineChart
+              data={lineChartData}
+              width={screenWidth - 48}
+              height={220}
+              chartConfig={{
+                backgroundColor: COLORS.white,
+                backgroundGradientFrom: COLORS.white,
+                backgroundGradientTo: COLORS.white,
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+                propsForDots: {
+                  r: "4",
+                  strokeWidth: "2",
+                  stroke: COLORS.white,
+                },
+              }}
+              bezier
+              style={styles.chart}
+            />
+          </View>
+          <View style={styles.timeframeContainer}>
             <View style={styles.timeframeSelector}>
-              <TouchableOpacity
-                style={[
-                  styles.timeframeButton,
-                  activeTimeframe === "week" && styles.activeTimeframe,
-                ]}
-                onPress={() => setActiveTimeframe("week")}
-              >
-                <Text
+              {["week", "month", "year"].map((timeframe) => (
+                <TouchableOpacity
+                  key={timeframe}
                   style={[
-                    styles.timeframeText,
-                    activeTimeframe === "week" && styles.activeTimeframeText,
+                    styles.timeframeButton,
+                    activeTimeframe === timeframe && styles.activeTimeframe,
                   ]}
+                  onPress={() => setActiveTimeframe(timeframe)}
                 >
-                  Week
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.timeframeButton,
-                  activeTimeframe === "month" && styles.activeTimeframe,
-                ]}
-                onPress={() => setActiveTimeframe("month")}
-              >
-                <Text
-                  style={[
-                    styles.timeframeText,
-                    activeTimeframe === "month" && styles.activeTimeframeText,
-                  ]}
-                >
-                  Month
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.timeframeButton,
-                  activeTimeframe === "year" && styles.activeTimeframe,
-                ]}
-                onPress={() => setActiveTimeframe("year")}
-              >
-                <Text
-                  style={[
-                    styles.timeframeText,
-                    activeTimeframe === "year" && styles.activeTimeframeText,
-                  ]}
-                >
-                  Year
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.timeframeText,
+                      activeTimeframe === timeframe &&
+                        styles.activeTimeframeText,
+                    ]}
+                  >
+                    {timeframe.charAt(0).toUpperCase() + timeframe.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
-          <LineChart
-            data={lineChartData}
-            width={screenWidth - 32}
-            height={220}
-            chartConfig={{
-              backgroundColor: COLORS.white,
-              backgroundGradientFrom: COLORS.white,
-              backgroundGradientTo: COLORS.white,
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: "4",
-                strokeWidth: "2",
-                stroke: COLORS.white,
-              },
-            }}
-            bezier
-            style={styles.chart}
-          />
         </View>
 
         {/* Expense Categories */}
         <View style={styles.chartSection}>
           <Text style={styles.sectionTitle}>Expense Categories</Text>
-          <PieChart
-            data={expensesByCategory}
-            width={screenWidth - 32}
-            height={200}
-            chartConfig={{
-              backgroundColor: COLORS.white,
-              backgroundGradientFrom: COLORS.white,
-              backgroundGradientTo: COLORS.white,
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            }}
-            accessor="amount"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
+          <View style={styles.pieChartContainer}>
+            <PieChart
+              style={{ height: 300 }}
+              data={pieData}
+              innerRadius="50%"
+              padAngle={0.02}
+            />
+            <View style={styles.legendContainer}>
+              {sortedExpenses.map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                  <View
+                    style={[
+                      styles.legendColor,
+                      { backgroundColor: item.color },
+                    ]}
+                  />
+                  <Text style={styles.legendText}>{item.name}</Text>
+                  <Text style={styles.legendAmount}>
+                    ${item.amount.toFixed(2)} (
+                    {((item.amount / totalExpense) * 100).toFixed(1)}%)
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
         </View>
 
         {/* Recent Transactions */}
@@ -225,8 +268,8 @@ const Dashboard = () => {
 };
 
 // Helper function to get a color based on category name
-function getRandomColor(category) {
-  const colors = {
+function getRandomColor(category: string): string {
+  const colors: Record<string, string> = {
     Food: "#FF6384",
     Transportation: "#36A2EB",
     Entertainment: "#FFCE56",
@@ -256,39 +299,69 @@ const styles = StyleSheet.create({
   },
   balanceCard: {
     backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
+    borderRadius: SIZES.radius * 1.5,
+    padding: SIZES.padding * 1.2,
     marginBottom: SIZES.padding,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  balanceHeader: {
+    marginBottom: SIZES.padding,
+  },
+  balanceTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
   },
   balanceTitle: {
     ...FONTS.h4,
     color: COLORS.grayDark,
-    marginBottom: 4,
+    marginLeft: 8,
   },
   balanceAmount: {
     ...FONTS.h1,
     color: COLORS.black,
-    marginBottom: SIZES.padding,
+    fontSize: 32,
+    fontWeight: "bold",
   },
   incomeExpenseRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: SIZES.padding,
   },
   incomeContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
   },
   expenseContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  amountContainer: {
+    flex: 1,
+  },
+  amountLabel: {
+    ...FONTS.body4,
+    color: COLORS.grayDark,
+    marginBottom: 4,
+  },
+  amountText: {
+    ...FONTS.h3,
+    fontWeight: "600",
   },
   divider: {
     width: 1,
@@ -296,44 +369,34 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.gray,
     marginHorizontal: SIZES.padding,
   },
-  incomeText: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
-    marginTop: 4,
-  },
-  expenseText: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
-    marginTop: 4,
-  },
-  amountText: {
-    ...FONTS.h3,
-    marginTop: 2,
-  },
   chartSection: {
     backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
+    borderRadius: SIZES.radius * 1.5,
+    padding: SIZES.padding * 1.2,
     marginBottom: SIZES.padding,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  chartContainer: {
     alignItems: "center",
-    marginBottom: SIZES.padding,
-  },
-  sectionTitle: {
-    ...FONTS.h3,
-    color: COLORS.black,
-  },
-  chart: {
-    marginVertical: 8,
+    marginTop: SIZES.padding,
+    backgroundColor: COLORS.white,
     borderRadius: SIZES.radius,
+    padding: SIZES.padding / 2,
+  },
+  pieChartContainer: {
+    alignItems: "center",
+    marginTop: SIZES.padding,
+    backgroundColor: COLORS.white,
+    borderRadius: SIZES.radius,
+    padding: SIZES.padding / 2,
+  },
+  timeframeContainer: {
+    marginTop: SIZES.padding,
+    alignItems: "center",
   },
   timeframeSelector: {
     flexDirection: "row",
@@ -342,8 +405,8 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   timeframeButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 20,
   },
   activeTimeframe: {
@@ -362,15 +425,30 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontFamily: "Inter-Medium",
   },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: SIZES.padding,
+  },
+  sectionTitle: {
+    ...FONTS.h3,
+    color: COLORS.black,
+    fontWeight: "600",
+  },
+  chart: {
+    marginVertical: 8,
+    borderRadius: SIZES.radius,
+  },
   transactionsSection: {
     backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
+    borderRadius: SIZES.radius * 1.5,
+    padding: SIZES.padding * 1.2,
     shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 12,
+    elevation: 8,
   },
   viewAllButton: {
     flexDirection: "row",
@@ -383,6 +461,32 @@ const styles = StyleSheet.create({
   },
   transactionsList: {
     marginTop: 8,
+  },
+  legendContainer: {
+    marginTop: SIZES.padding,
+    width: "100%",
+    paddingHorizontal: SIZES.padding,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  legendColor: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  legendText: {
+    ...FONTS.body4,
+    color: COLORS.grayDark,
+    flex: 1,
+  },
+  legendAmount: {
+    ...FONTS.body4,
+    color: COLORS.black,
+    fontWeight: "500",
   },
 });
 

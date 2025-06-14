@@ -6,7 +6,7 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { SplashScreen, Stack } from "expo-router";
+import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -16,7 +16,9 @@ import { useAuthStore } from "../store/auth";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const { token, loading, checkToken } = useAuthStore();
+  const segments = useSegments();
+  const router = useRouter();
+  const { user, token, error, loading, checkToken } = useAuthStore();
   const [fontsLoaded, fontError] = useFonts({
     "Inter-Regular": Inter_400Regular,
     "Inter-Medium": Inter_500Medium,
@@ -42,7 +44,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <SafeScreen>
-        <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(auth)" />

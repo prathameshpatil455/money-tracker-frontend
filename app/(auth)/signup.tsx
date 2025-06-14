@@ -1,9 +1,10 @@
 import { COLORS } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -21,10 +22,41 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [userName, setUserName] = useState("");
   const router = useRouter();
-  const register = useAuthStore((state) => state.register);
+  const { register, error, clearError } = useAuthStore();
 
-  const handleSignUp = () => {
-    router.push("/(auth)/login");
+  const handleSignUp = async () => {
+    if (!userName || !email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      clearError();
+      const success = await register({
+        name: userName,
+        email,
+        password,
+      });
+
+      if (success) {
+        router.replace("/(auth)");
+      } else {
+        console.log(error, "error");
+        Alert.alert(
+          "Registration Failed",
+          "Please check your details and try again"
+        );
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      Alert.alert(
+        "Error",
+        "An error occurred during registration. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
