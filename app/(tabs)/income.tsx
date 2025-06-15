@@ -340,13 +340,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 4,
   },
   noteInput: {
     flex: 1,
     fontSize: 16,
     marginLeft: 8,
-    minHeight: 80,
+    minHeight: 100,
     textAlignVertical: "top",
   },
   recentTransactionsSection: {

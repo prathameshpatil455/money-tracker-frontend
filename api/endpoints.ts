@@ -21,7 +21,12 @@ export const ENDPOINTS = {
     CREATE: "/api/transactions",
     UPDATE: (id: string) => `/api/transactions/${id}`,
     DELETE: (id: string) => `/api/transactions/${id}`,
-    DETAILS: (id: string) => `/api/transactions/${id}`,
+    SUMMARY: {
+      CARDS: "/api/transactions/summary/cards",
+      TRENDS: (range: "weekly" | "monthly" | "yearly") =>
+        `/api/transactions/summary/trends?range=${range}`,
+      CATEGORIES: "/api/transactions/summary/categories",
+    },
   },
 
   // Category endpoints
@@ -46,5 +51,12 @@ export const ENDPOINTS = {
     MONTHLY: "/api/reports/monthly",
     YEARLY: "/api/reports/yearly",
     CATEGORY: "/api/reports/category",
+  },
+
+  // Dashboard endpoints
+  DASHBOARD: {
+    WEEKLY: "/api/dashboard/weekly",
+    MONTHLY: "/api/dashboard/monthly",
+    YEARLY: "/api/dashboard/yearly",
   },
 } as const;

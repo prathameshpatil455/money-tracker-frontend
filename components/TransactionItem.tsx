@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { Transaction } from "@/types";
+import { Transaction as TransactionType } from "@/types";
 import { getTransactionIconName } from "@/utils/transactionIcons";
 import { format } from "date-fns";
 import { IndianRupee } from "lucide-react-native";
@@ -7,7 +7,17 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface TransactionItemProps {
-  transaction: Transaction;
+  transaction:
+    | TransactionType
+    | {
+        _id: string;
+        amount: number;
+        type: "income" | "expense";
+        category: string;
+        description: string;
+        date: string;
+        userId: string;
+      };
   isLast?: boolean;
 }
 
@@ -16,7 +26,9 @@ const TransactionItem = ({
   isLast = false,
 }: TransactionItemProps) => {
   const { colors } = useTheme();
-  const { category, amount, date, type, title } = transaction;
+  const { category, amount, date, type } = transaction;
+  const title =
+    "title" in transaction ? transaction.title : transaction.description;
 
   // Get the icon for this transaction category
   const iconName = getTransactionIconName(category, type);
@@ -47,7 +59,7 @@ const TransactionItem = ({
 
       <View style={styles.detailsContainer}>
         <Text style={[styles.title, { color: colors.textPrimary }]}>
-          {title || category}
+          {category || title}
         </Text>
         <Text style={[styles.date, { color: colors.textPrimary }]}>
           {format(new Date(date), "MMM d, yyyy")}
