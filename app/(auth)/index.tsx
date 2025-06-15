@@ -8,7 +8,6 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -149,11 +148,3 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const localStyles = StyleSheet.create({
-  errorText: {
-    color: "red",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-});

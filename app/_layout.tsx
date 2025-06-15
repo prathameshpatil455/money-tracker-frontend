@@ -1,4 +1,5 @@
 import SafeScreen from "@/components/SafeScreen";
+import { ThemeProvider } from "@/context/ThemeContext";
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -42,16 +43,21 @@ export default function RootLayout() {
   if ((!fontsLoaded && !fontError) || loading) return null;
 
   return (
-    <SafeAreaProvider>
-      <SafeScreen>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="+not-found" options={{ title: "Oops!" }} />
-        </Stack>
-        <StatusBar style="dark" />
-      </SafeScreen>
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
+        <SafeScreen>
+          <Stack
+            screenOptions={{ headerShown: false }}
+            // initialRouteName="(tabs)"
+          >
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="+not-found" options={{ title: "Oops!" }} />
+          </Stack>
+          <StatusBar style="light" />
+        </SafeScreen>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }

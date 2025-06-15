@@ -1,4 +1,4 @@
-import { COLORS, FONTS } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 import {
   ScrollView,
   StyleSheet,
@@ -24,6 +24,75 @@ interface CategorySelectionProps {
   onSelectCategory: (category: string) => void;
 }
 
+interface AnimatedCategoryItemProps {
+  category: Category;
+  isSelected: boolean;
+  onSelect: (value: string) => void;
+}
+
+const AnimatedCategoryItem = ({
+  category,
+  isSelected,
+  onSelect,
+}: AnimatedCategoryItemProps) => {
+  const { colors } = useTheme();
+
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(isSelected ? 1 : 0, { duration: 150 }),
+      transform: [
+        {
+          scale: withTiming(isSelected ? 1 : 0.8, { duration: 200 }),
+        },
+      ],
+    };
+  });
+
+  return (
+    <TouchableOpacity
+      style={styles.categoryItem}
+      onPress={() => onSelect(category.value)}
+      activeOpacity={0.7}
+    >
+      <View
+        style={[
+          styles.iconContainer,
+          {
+            backgroundColor: colors.inputBackground,
+            borderColor: isSelected
+              ? category.color || colors.primary
+              : "transparent",
+          },
+        ]}
+      >
+        {category.icon}
+        {isSelected && (
+          <Animated.View
+            style={[
+              styles.selectedIndicator,
+              { backgroundColor: category.color || colors.primary },
+              animatedStyles,
+            ]}
+          />
+        )}
+      </View>
+      <Text
+        style={[
+          styles.categoryLabel,
+          { color: colors.textPrimary },
+          isSelected && {
+            color: colors.primary,
+            fontFamily: "Inter-Medium",
+          },
+        ]}
+        numberOfLines={1}
+      >
+        {category.label}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
 const CategorySelection = ({
   categories,
   selectedCategory,
@@ -35,64 +104,14 @@ const CategorySelection = ({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}
     >
-      {categories.map((category) => {
-        const isSelected = category.value === selectedCategory;
-
-        // Create animated styles for the selected indicator
-        const animatedStyles = useAnimatedStyle(() => {
-          return {
-            opacity: withTiming(isSelected ? 1 : 0, { duration: 150 }),
-            transform: [
-              {
-                scale: withTiming(isSelected ? 1 : 0.8, { duration: 200 }),
-              },
-            ],
-          };
-        });
-
-        return (
-          <TouchableOpacity
-            key={category.value}
-            style={styles.categoryItem}
-            onPress={() => onSelectCategory(category.value)}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.iconContainer,
-                {
-                  borderColor: isSelected
-                    ? category.color || COLORS.primary
-                    : "transparent",
-                },
-              ]}
-            >
-              {category.icon}
-              {isSelected && (
-                <Animated.View
-                  style={[
-                    styles.selectedIndicator,
-                    { backgroundColor: category.color || COLORS.primary },
-                    animatedStyles,
-                  ]}
-                />
-              )}
-            </View>
-            <Text
-              style={[
-                styles.categoryLabel,
-                isSelected && {
-                  color: COLORS.black,
-                  fontFamily: "Inter-Medium",
-                },
-              ]}
-              numberOfLines={1}
-            >
-              {category.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
+      {categories.map((category) => (
+        <AnimatedCategoryItem
+          key={category.value}
+          category={category}
+          isSelected={category.value === selectedCategory}
+          onSelect={onSelectCategory}
+        />
+      ))}
     </ScrollView>
   );
 };
@@ -112,10 +131,9 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: COLORS.white,
     marginBottom: 8,
     borderWidth: 2,
-    shadowColor: COLORS.black,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -129,8 +147,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   categoryLabel: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
+    fontSize: 14,
     textAlign: "center",
   },
 });

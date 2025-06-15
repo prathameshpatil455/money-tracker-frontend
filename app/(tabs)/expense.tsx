@@ -2,7 +2,7 @@ import Button from "@/components/Button";
 import CategorySelection from "@/components/CategorySelection";
 import Header from "@/components/Header";
 import TransactionItem from "@/components/TransactionItem";
-import { COLORS, FONTS, SIZES } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 import { expenseCategoriesWithIcons } from "@/data/categories";
 import { useTransactionStore } from "@/store/transaction";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -24,6 +24,7 @@ interface GroupedTransactions {
 }
 
 const ExpenseScreen = () => {
+  const { colors } = useTheme();
   const { transactions, loading, fetchTransactions, createTransaction } =
     useTransactionStore();
   const [amount, setAmount] = useState("");
@@ -86,14 +87,25 @@ const ExpenseScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header title="Expenses" />
 
       {/* 🧾 Recent Transactions */}
-      <View style={styles.recentTransactionsSection}>
-        <Text style={styles.sectionTitle}>Recent Expenses</Text>
+      <View
+        style={[
+          styles.recentTransactionsSection,
+          { backgroundColor: colors.cardBackground },
+        ]}
+      >
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          Recent Expenses
+        </Text>
         {loading ? (
-          <Text style={styles.noTransactionsText}>Loading transactions...</Text>
+          <Text
+            style={[styles.noTransactionsText, { color: colors.textSecondary }]}
+          >
+            Loading transactions...
+          </Text>
         ) : sortedMonths.length > 0 ? (
           <ScrollView
             style={styles.transactionsList}
@@ -101,7 +113,11 @@ const ExpenseScreen = () => {
           >
             {sortedMonths.map((monthYear, monthIndex) => (
               <View key={monthYear}>
-                <Text style={styles.monthHeader}>{monthYear}</Text>
+                <Text
+                  style={[styles.monthHeader, { color: colors.textSecondary }]}
+                >
+                  {monthYear}
+                </Text>
                 {groupedTransactions[monthYear].map((transaction, index) => (
                   <TransactionItem
                     key={transaction._id}
@@ -113,15 +129,20 @@ const ExpenseScreen = () => {
             ))}
           </ScrollView>
         ) : (
-          <Text style={styles.noTransactionsText}>
+          <Text
+            style={[styles.noTransactionsText, { color: colors.textSecondary }]}
+          >
             No expense transactions yet
           </Text>
         )}
       </View>
 
       {/* ➕ Floating Add Button */}
-      <TouchableOpacity style={styles.fab} onPress={() => setShowModal(true)}>
-        <Plus size={28} color={COLORS.white} />
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => setShowModal(true)}
+      >
+        <Plus size={28} color={colors.white} />
       </TouchableOpacity>
 
       {/* ⬇️ Bottom Modal */}
@@ -131,15 +152,24 @@ const ExpenseScreen = () => {
         transparent
         onRequestClose={() => setShowModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <View
+          style={[styles.modalOverlay, { backgroundColor: "rgba(0,0,0,0.5)" }]}
+        >
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: colors.cardBackground },
+            ]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Expense</Text>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                Add Expense
+              </Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setShowModal(false)}
               >
-                <X size={24} color={COLORS.grayDark} />
+                <X size={24} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
@@ -150,23 +180,36 @@ const ExpenseScreen = () => {
             >
               {/* Amount Input */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>Amount</Text>
-                <View style={styles.amountInputContainer}>
-                  <IndianRupee size={20} color={COLORS.grayDark} />
+                <Text
+                  style={[styles.inputLabel, { color: colors.textPrimary }]}
+                >
+                  Amount
+                </Text>
+                <View
+                  style={[
+                    styles.amountInputContainer,
+                    { backgroundColor: colors.inputBackground },
+                  ]}
+                >
+                  <IndianRupee size={20} color={colors.textSecondary} />
                   <TextInput
-                    style={styles.amountInput}
+                    style={[styles.amountInput, { color: colors.textPrimary }]}
                     value={amount}
                     onChangeText={handleAmountChange}
                     placeholder="0.00"
                     keyboardType="numeric"
-                    placeholderTextColor={COLORS.grayMedium}
+                    placeholderTextColor={colors.placeholderText}
                   />
                 </View>
               </View>
 
               {/* Category Selection */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>Category</Text>
+                <Text
+                  style={[styles.inputLabel, { color: colors.textPrimary }]}
+                >
+                  Category
+                </Text>
                 <CategorySelection
                   categories={expenseCategoriesWithIcons}
                   selectedCategory={selectedCategory}
@@ -176,13 +219,22 @@ const ExpenseScreen = () => {
 
               {/* Date Selection */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>Date</Text>
+                <Text
+                  style={[styles.inputLabel, { color: colors.textPrimary }]}
+                >
+                  Date
+                </Text>
                 <TouchableOpacity
-                  style={styles.dateSelector}
+                  style={[
+                    styles.dateSelector,
+                    { backgroundColor: colors.inputBackground },
+                  ]}
                   onPress={() => setShowDatePicker(true)}
                 >
-                  <Calendar size={20} color={COLORS.grayDark} />
-                  <Text style={styles.dateText}>
+                  <Calendar size={20} color={colors.textSecondary} />
+                  <Text
+                    style={[styles.dateText, { color: colors.textPrimary }]}
+                  >
                     {format(date, "MMMM d, yyyy")}
                   </Text>
                 </TouchableOpacity>
@@ -190,19 +242,28 @@ const ExpenseScreen = () => {
 
               {/* Note Input */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>Note</Text>
-                <View style={styles.noteInputContainer}>
+                <Text
+                  style={[styles.inputLabel, { color: colors.textPrimary }]}
+                >
+                  Note
+                </Text>
+                <View
+                  style={[
+                    styles.noteInputContainer,
+                    { backgroundColor: colors.inputBackground },
+                  ]}
+                >
                   <Bookmark
                     size={20}
-                    color={COLORS.grayDark}
+                    color={colors.textSecondary}
                     style={{ marginTop: 10 }}
                   />
                   <TextInput
-                    style={styles.noteInput}
+                    style={[styles.noteInput, { color: colors.textPrimary }]}
                     value={note}
                     onChangeText={setNote}
                     placeholder="Add a note"
-                    placeholderTextColor={COLORS.grayMedium}
+                    placeholderTextColor={colors.placeholderText}
                     multiline
                   />
                 </View>
@@ -236,7 +297,6 @@ const ExpenseScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
     paddingBottom: 120,
     padding: 16,
   },
@@ -244,169 +304,113 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   inputSection: {
-    marginBottom: SIZES.radius,
+    marginBottom: 16,
     marginHorizontal: 4,
   },
   inputLabel: {
-    ...FONTS.h4,
-    color: COLORS.black,
+    fontSize: 16,
     marginBottom: 8,
   },
   amountInputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  amountInput: {
+    flex: 1,
+    fontSize: 18,
+    marginLeft: 8,
+  },
+  dateSelector: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  dateText: {
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  noteInputContainer: {
+    flexDirection: "row",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  noteInput: {
+    flex: 1,
+    fontSize: 16,
+    marginLeft: 8,
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  recentTransactionsSection: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  transactionsList: {
+    flex: 1,
+  },
+  monthHeader: {
+    fontSize: 14,
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  noTransactionsText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 32,
+  },
+  fab: {
+    position: "absolute",
+    right: 24,
+    bottom: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: "center",
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    paddingHorizontal: SIZES.padding,
-    height: 50,
-    borderWidth: 1,
-    borderColor: COLORS.gray,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    alignItems: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    maxHeight: "90%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
+    marginBottom: 24,
   },
   modalTitle: {
-    ...FONTS.h3,
+    fontSize: 20,
     fontWeight: "bold",
-    color: COLORS.black,
   },
   closeButton: {
-    padding: 8,
-  },
-  currencySymbol: {
-    ...FONTS.h2,
-    color: COLORS.black,
-    marginRight: 8,
-  },
-  amountInput: {
-    flex: 1,
-    ...FONTS.h2,
-    color: COLORS.black,
-    height: "100%",
-    marginTop: 6,
-  },
-  dateSelector: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    paddingHorizontal: SIZES.padding,
-    height: 50,
-    borderWidth: 1,
-    borderColor: COLORS.gray,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  dateText: {
-    ...FONTS.body3,
-    color: COLORS.black,
-    marginLeft: 8,
-  },
-  noteInputContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
-    minHeight: 140,
-    borderWidth: 1,
-    borderColor: COLORS.gray,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  noteInput: {
-    flex: 1,
-    ...FONTS.body3,
-    color: COLORS.black,
-    marginLeft: 8,
-    textAlignVertical: "top",
+    padding: 4,
   },
   addButton: {
-    marginVertical: SIZES.padding,
-  },
-  recentTransactionsSection: {
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
-    marginTop: SIZES.padding,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-    marginBottom: 80,
-  },
-  sectionTitle: {
-    ...FONTS.h3,
-    color: COLORS.black,
-    marginBottom: 16,
-  },
-  transactionsList: {
-    maxHeight: 500,
-    paddingBottom: 120,
-  },
-  noTransactionsText: {
-    ...FONTS.body3,
-    color: COLORS.grayMedium,
-    textAlign: "center",
-    marginVertical: SIZES.padding,
-  },
-  fab: {
-    position: "absolute",
-    bottom: 120,
-    right: 20,
-    backgroundColor: COLORS.primary,
-    padding: 16,
-    borderRadius: 50,
-    elevation: 4,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    zIndex: 1,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "90%",
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 20,
-  },
-  monthHeader: {
-    ...FONTS.h4,
-    color: COLORS.grayDark,
-    marginTop: 16,
-    marginBottom: 8,
-    paddingHorizontal: 4,
+    marginTop: 24,
   },
 });
 

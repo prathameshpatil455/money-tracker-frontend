@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import { COLORS, FONTS, SIZES } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 import {
   Bell,
   ChevronRight,
@@ -21,6 +21,8 @@ import {
 } from "react-native";
 
 const ProfileScreen = () => {
+  const { colors } = useTheme();
+
   const profileSections = [
     {
       title: "Account",
@@ -28,19 +30,19 @@ const ProfileScreen = () => {
         {
           id: "personal",
           title: "Personal Information",
-          icon: <User size={20} color={COLORS.grayDark} />,
+          icon: <User size={20} color={colors.textSecondary} />,
           action: () => console.log("Personal Information"),
         },
         {
           id: "payment",
           title: "Payment Methods",
-          icon: <CreditCard size={20} color={COLORS.grayDark} />,
+          icon: <CreditCard size={20} color={colors.textSecondary} />,
           action: () => console.log("Payment Methods"),
         },
         {
           id: "security",
           title: "Security",
-          icon: <Shield size={20} color={COLORS.grayDark} />,
+          icon: <Shield size={20} color={colors.textSecondary} />,
           action: () => console.log("Security"),
         },
       ],
@@ -51,13 +53,13 @@ const ProfileScreen = () => {
         {
           id: "notifications",
           title: "Notifications",
-          icon: <Bell size={20} color={COLORS.grayDark} />,
+          icon: <Bell size={20} color={colors.textSecondary} />,
           action: () => console.log("Notifications"),
         },
         {
           id: "appearance",
           title: "Appearance",
-          icon: <Moon size={20} color={COLORS.grayDark} />,
+          icon: <Moon size={20} color={colors.textSecondary} />,
           action: () => console.log("Appearance"),
         },
       ],
@@ -68,13 +70,13 @@ const ProfileScreen = () => {
         {
           id: "help",
           title: "Help Center",
-          icon: <HelpCircle size={20} color={COLORS.grayDark} />,
+          icon: <HelpCircle size={20} color={colors.textSecondary} />,
           action: () => console.log("Help Center"),
         },
         {
           id: "settings",
           title: "App Settings",
-          icon: <Settings size={20} color={COLORS.grayDark} />,
+          icon: <Settings size={20} color={colors.textSecondary} />,
           action: () => console.log("App Settings"),
         },
       ],
@@ -82,14 +84,19 @@ const ProfileScreen = () => {
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header title="Profile" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Profile Card */}
-        <View style={styles.profileCard}>
+        <View
+          style={[
+            styles.profileCard,
+            { backgroundColor: colors.cardBackground },
+          ]}
+        >
           <Image
             source={{
               uri: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300",
@@ -97,37 +104,75 @@ const ProfileScreen = () => {
             style={styles.profileImage}
           />
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>John Doe</Text>
-            <Text style={styles.profileEmail}>john.doe@example.com</Text>
+            <Text style={[styles.profileName, { color: colors.textPrimary }]}>
+              John Doe
+            </Text>
+            <Text
+              style={[styles.profileEmail, { color: colors.textSecondary }]}
+            >
+              john.doe@example.com
+            </Text>
           </View>
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Edit</Text>
+          <TouchableOpacity
+            style={[
+              styles.editButton,
+              { backgroundColor: colors.inputBackground },
+            ]}
+          >
+            <Text style={[styles.editButtonText, { color: colors.primary }]}>
+              Edit
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Stats Overview */}
-        <View style={styles.statsCard}>
+        <View
+          style={[styles.statsCard, { backgroundColor: colors.cardBackground }]}
+        >
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>$2,450</Text>
-            <Text style={styles.statLabel}>Income</Text>
+            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
+              $2,450
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+              Income
+            </Text>
           </View>
-          <View style={styles.statDivider} />
+          <View
+            style={[styles.statDivider, { backgroundColor: colors.border }]}
+          />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>$1,870</Text>
-            <Text style={styles.statLabel}>Expenses</Text>
+            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
+              $1,870
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+              Expenses
+            </Text>
           </View>
-          <View style={styles.statDivider} />
+          <View
+            style={[styles.statDivider, { backgroundColor: colors.border }]}
+          />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>$580</Text>
-            <Text style={styles.statLabel}>Balance</Text>
+            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
+              $580
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+              Balance
+            </Text>
           </View>
         </View>
 
         {/* Profile Sections */}
         {profileSections.map((section) => (
           <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={styles.sectionContent}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+              {section.title}
+            </Text>
+            <View
+              style={[
+                styles.sectionContent,
+                { backgroundColor: colors.cardBackground },
+              ]}
+            >
               {section.items.map((item, index) => (
                 <TouchableOpacity
                   key={item.id}
@@ -140,9 +185,16 @@ const ProfileScreen = () => {
                 >
                   <View style={styles.sectionItemLeft}>
                     {item.icon}
-                    <Text style={styles.sectionItemText}>{item.title}</Text>
+                    <Text
+                      style={[
+                        styles.sectionItemText,
+                        { color: colors.textPrimary },
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
                   </View>
-                  <ChevronRight size={20} color={COLORS.gray} />
+                  <ChevronRight size={20} color={colors.textSecondary} />
                 </TouchableOpacity>
               ))}
             </View>
@@ -150,13 +202,22 @@ const ProfileScreen = () => {
         ))}
 
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton}>
-          <LogOut size={20} color={COLORS.expense} />
-          <Text style={styles.logoutText}>Log Out</Text>
+        <TouchableOpacity
+          style={[
+            styles.logoutButton,
+            { backgroundColor: colors.cardBackground },
+          ]}
+        >
+          <LogOut size={20} color={colors.error} />
+          <Text style={[styles.logoutText, { color: colors.error }]}>
+            Log Out
+          </Text>
         </TouchableOpacity>
 
         {/* App Version */}
-        <Text style={styles.versionText}>App Version 1.0.0</Text>
+        <Text style={[styles.versionText, { color: colors.textSecondary }]}>
+          App Version 1.0.0
+        </Text>
       </ScrollView>
     </View>
   );
@@ -165,20 +226,18 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    padding: SIZES.padding,
-    paddingBottom: SIZES.padding * 2,
+    padding: 16,
+    paddingBottom: 32,
   },
   profileCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
-    marginBottom: SIZES.padding,
-    shadowColor: COLORS.black,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -191,35 +250,31 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     flex: 1,
-    marginLeft: SIZES.padding,
+    marginLeft: 16,
   },
   profileName: {
-    ...FONTS.h3,
-    color: COLORS.black,
+    fontSize: 18,
+    fontWeight: "bold",
   },
   profileEmail: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
+    fontSize: 14,
     marginTop: 4,
   },
   editButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: COLORS.lightGray,
     borderRadius: 20,
   },
   editButtonText: {
-    ...FONTS.body4,
-    color: COLORS.primary,
+    fontSize: 14,
     fontFamily: "Inter-Medium",
   },
   statsCard: {
     flexDirection: "row",
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
-    marginBottom: SIZES.padding,
-    shadowColor: COLORS.black,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -230,32 +285,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statValue: {
-    ...FONTS.h3,
-    color: COLORS.black,
+    fontSize: 18,
+    fontWeight: "bold",
   },
   statLabel: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
+    fontSize: 14,
     marginTop: 4,
   },
   statDivider: {
     width: 1,
     height: "100%",
-    backgroundColor: COLORS.gray,
   },
   section: {
-    marginBottom: SIZES.padding,
+    marginBottom: 16,
   },
   sectionTitle: {
-    ...FONTS.h4,
-    color: COLORS.grayDark,
+    fontSize: 16,
+    fontWeight: "600",
     marginBottom: 8,
   },
   sectionContent: {
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
+    borderRadius: 16,
     overflow: "hidden",
-    shadowColor: COLORS.black,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -265,9 +317,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: SIZES.padding,
+    padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
+    borderBottomColor: "rgba(0,0,0,0.1)",
   },
   sectionItemLast: {
     borderBottomWidth: 0,
@@ -277,36 +329,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sectionItemText: {
-    ...FONTS.body3,
-    color: COLORS.black,
+    fontSize: 16,
     marginLeft: 12,
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding,
-    marginTop: SIZES.padding * 2,
-    marginBottom: SIZES.padding,
-    shadowColor: COLORS.black,
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
   },
   logoutText: {
-    ...FONTS.body3,
-    color: COLORS.expense,
+    fontSize: 16,
+    fontWeight: "600",
     marginLeft: 8,
-    fontFamily: "Inter-Medium",
   },
   versionText: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
+    fontSize: 14,
     textAlign: "center",
-    marginTop: SIZES.padding,
+    marginTop: 8,
   },
 });
 

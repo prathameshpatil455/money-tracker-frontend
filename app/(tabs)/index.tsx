@@ -1,14 +1,15 @@
 import Header from "@/components/Header";
 import TransactionItem from "@/components/TransactionItem";
-import { COLORS, FONTS, SIZES } from "@/constants/theme";
-import { mockTransactions } from "@/data/mockData";
+import { useTheme } from "@/context/ThemeContext";
+import { useTransactionStore } from "@/store/transaction";
 import {
   ChevronRight,
+  IndianRupee,
   TrendingDown,
   TrendingUp,
   Wallet,
 } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -36,24 +37,32 @@ interface PieDataItem {
 }
 
 const Dashboard = () => {
+  const { colors } = useTheme();
   const [activeTimeframe, setActiveTimeframe] = useState("week");
+  const { transactions, loading, fetchTransactions } = useTransactionStore();
 
-  // Filter transactions for the recent list
-  const recentTransactions = mockTransactions.slice(0, 5);
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  // Filter transactions for the recent list (last 5 transactions)
+  const recentTransactions = [...transactions]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
 
   // Calculate income, expenses and balance
-  const totalIncome = mockTransactions
+  const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((acc, curr) => acc + curr.amount, 0);
 
-  const totalExpenses = mockTransactions
+  const totalExpenses = transactions
     .filter((t) => t.type === "expense")
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const balance = totalIncome - totalExpenses;
 
   // Pie chart data for expense categories
-  const expensesByCategory = mockTransactions
+  const expensesByCategory = transactions
     .filter((t) => t.type === "expense")
     .reduce((acc: ChartDataItem[], curr) => {
       const existingCategory = acc.find((item) => item.name === curr.category);
@@ -94,12 +103,12 @@ const Dashboard = () => {
     datasets: [
       {
         data: [500, 700, 650, 800, 950, 1200],
-        color: () => COLORS.primary,
+        color: () => colors.primary,
         strokeWidth: 2,
       },
       {
         data: [300, 450, 380, 500, 600, 450],
-        color: () => COLORS.expense,
+        color: () => colors.error,
         strokeWidth: 2,
       },
     ],
@@ -107,52 +116,70 @@ const Dashboard = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header title="Dashboard" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Balance Overview */}
-        <View style={styles.balanceCard}>
+        <View
+          style={[
+            styles.balanceCard,
+            { backgroundColor: colors.cardBackground },
+          ]}
+        >
           <View style={styles.balanceHeader}>
             <View style={styles.balanceTitleContainer}>
-              <Wallet size={24} color={COLORS.primary} />
-              <Text style={styles.balanceTitle}>Total Balance</Text>
+              <Wallet size={24} color={colors.textPrimary} />
+              <Text
+                style={[styles.balanceTitle, { color: colors.textPrimary }]}
+              >
+                Total Balance
+              </Text>
             </View>
-            <Text style={styles.balanceAmount}>${balance.toFixed(2)}</Text>
+            <Text style={[styles.balanceAmount, { color: colors.textPrimary }]}>
+              <IndianRupee size={24} color={colors.textPrimary} />
+              {balance.toFixed(2)}
+            </Text>
           </View>
           <View style={styles.incomeExpenseRow}>
             <View style={styles.incomeContainer}>
-              <View
-                style={[
-                  styles.iconContainer,
-                  { backgroundColor: COLORS.success + "20" },
-                ]}
-              >
-                <TrendingUp size={20} color={COLORS.success} />
+              <View style={[styles.iconContainer]}>
+                <TrendingUp size={20} color={colors.primary} />
               </View>
               <View style={styles.amountContainer}>
-                <Text style={styles.amountLabel}>Income</Text>
-                <Text style={[styles.amountText, { color: COLORS.success }]}>
-                  ${totalIncome.toFixed(2)}
+                <Text
+                  style={[styles.amountLabel, { color: colors.textPrimary }]}
+                >
+                  Income
+                </Text>
+                <Text
+                  style={[styles.amountText, { color: colors.textPrimary }]}
+                >
+                  <IndianRupee size={12} color={colors.textPrimary} />
+                  {totalIncome.toFixed(2)}
                 </Text>
               </View>
             </View>
-            <View style={styles.divider} />
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
             <View style={styles.expenseContainer}>
-              <View
-                style={[
-                  styles.iconContainer,
-                  { backgroundColor: COLORS.expense + "20" },
-                ]}
-              >
-                <TrendingDown size={20} color={COLORS.expense} />
+              <View style={[styles.iconContainer]}>
+                <TrendingDown size={20} color={colors.error} />
               </View>
               <View style={styles.amountContainer}>
-                <Text style={styles.amountLabel}>Expense</Text>
-                <Text style={[styles.amountText, { color: COLORS.expense }]}>
-                  ${totalExpenses.toFixed(2)}
+                <Text
+                  style={[styles.amountLabel, { color: colors.textPrimary }]}
+                >
+                  Expense
+                </Text>
+                <Text
+                  style={[styles.amountText, { color: colors.textPrimary }]}
+                >
+                  <IndianRupee size={12} color={colors.textPrimary} />
+                  {totalExpenses.toFixed(2)}
                 </Text>
               </View>
             </View>
@@ -160,27 +187,34 @@ const Dashboard = () => {
         </View>
 
         {/* Spending Overview */}
-        <View style={styles.chartSection}>
-          <Text style={styles.sectionTitle}>Spending Overview</Text>
+        <View
+          style={[
+            styles.chartSection,
+            { backgroundColor: colors.cardBackground },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            Spending Overview
+          </Text>
           <View style={styles.chartContainer}>
             <LineChart
               data={lineChartData}
               width={screenWidth - 48}
               height={220}
               chartConfig={{
-                backgroundColor: COLORS.white,
-                backgroundGradientFrom: COLORS.white,
-                backgroundGradientTo: COLORS.white,
+                backgroundColor: colors.cardBackground,
+                backgroundGradientFrom: colors.cardBackground,
+                backgroundGradientTo: colors.cardBackground,
                 decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(189, 189, 189, ${opacity})`,
                 style: {
                   borderRadius: 16,
                 },
                 propsForDots: {
                   r: "4",
                   strokeWidth: "2",
-                  stroke: COLORS.white,
+                  stroke: colors.cardBackground,
                 },
               }}
               bezier
@@ -194,15 +228,17 @@ const Dashboard = () => {
                   key={timeframe}
                   style={[
                     styles.timeframeButton,
-                    activeTimeframe === timeframe && styles.activeTimeframe,
+                    activeTimeframe === timeframe && {
+                      backgroundColor: colors.primary,
+                    },
                   ]}
                   onPress={() => setActiveTimeframe(timeframe)}
                 >
                   <Text
                     style={[
                       styles.timeframeText,
-                      activeTimeframe === timeframe &&
-                        styles.activeTimeframeText,
+                      { color: colors.textPrimary },
+                      activeTimeframe === timeframe && { color: colors.white },
                     ]}
                   >
                     {timeframe.charAt(0).toUpperCase() + timeframe.slice(1)}
@@ -214,8 +250,15 @@ const Dashboard = () => {
         </View>
 
         {/* Expense Categories */}
-        <View style={styles.chartSection}>
-          <Text style={styles.sectionTitle}>Expense Categories</Text>
+        <View
+          style={[
+            styles.chartSection,
+            { backgroundColor: colors.cardBackground },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            Expense Categories
+          </Text>
           <View style={styles.pieChartContainer}>
             <PieChart
               style={{ height: 300 }}
@@ -232,9 +275,19 @@ const Dashboard = () => {
                       { backgroundColor: item.color },
                     ]}
                   />
-                  <Text style={styles.legendText}>{item.name}</Text>
-                  <Text style={styles.legendAmount}>
-                    ${item.amount.toFixed(2)} (
+                  <Text
+                    style={[styles.legendText, { color: colors.textPrimary }]}
+                  >
+                    {item.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.legendAmount,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    <IndianRupee size={10} color={colors.textSecondary} />
+                    {item.amount.toFixed(2)} (
                     {((item.amount / totalExpense) * 100).toFixed(1)}%)
                   </Text>
                 </View>
@@ -246,20 +299,47 @@ const Dashboard = () => {
         {/* Recent Transactions */}
         <View style={styles.transactionsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Transactions</Text>
+            <Text
+              style={[
+                styles.sectionTitle,
+                { marginBottom: 4 },
+                { color: colors.textPrimary },
+              ]}
+            >
+              Recent Transactions
+            </Text>
             <TouchableOpacity style={styles.viewAllButton}>
-              <Text style={styles.viewAllText}>View All</Text>
-              <ChevronRight size={16} color={COLORS.primary} />
+              <Text style={[styles.viewAllText, { color: colors.primary }]}>
+                View All
+              </Text>
+              <ChevronRight size={16} color={colors.primary} />
             </TouchableOpacity>
           </View>
           <View style={styles.transactionsList}>
-            {recentTransactions.map((transaction, index) => (
-              <TransactionItem
-                key={transaction.id}
-                transaction={transaction}
-                isLast={index === recentTransactions.length - 1}
-              />
-            ))}
+            {loading ? (
+              <Text
+                style={[styles.loadingText, { color: colors.textSecondary }]}
+              >
+                Loading transactions...
+              </Text>
+            ) : recentTransactions.length > 0 ? (
+              recentTransactions.map((transaction, index) => (
+                <TransactionItem
+                  key={transaction._id}
+                  transaction={transaction}
+                  isLast={index === recentTransactions.length - 1}
+                />
+              ))
+            ) : (
+              <Text
+                style={[
+                  styles.noTransactionsText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                No transactions yet
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -290,26 +370,18 @@ function getRandomColor(category: string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
-    paddingBottom: 80,
   },
   scrollContent: {
-    padding: SIZES.padding,
-    paddingBottom: SIZES.padding * 2,
+    padding: 24,
+    paddingBottom: 100,
   },
   balanceCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius * 1.5,
-    padding: SIZES.padding * 1.2,
-    marginBottom: SIZES.padding,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
   },
   balanceHeader: {
-    marginBottom: SIZES.padding,
+    marginBottom: 20,
   },
   balanceTitleContainer: {
     flexDirection: "row",
@@ -317,13 +389,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   balanceTitle: {
-    ...FONTS.h4,
-    color: COLORS.grayDark,
+    fontSize: 16,
     marginLeft: 8,
   },
   balanceAmount: {
-    ...FONTS.h1,
-    color: COLORS.black,
     fontSize: 32,
     fontWeight: "bold",
   },
@@ -331,7 +400,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: SIZES.padding,
   },
   incomeContainer: {
     flex: 1,
@@ -346,131 +414,74 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
   },
   amountContainer: {
     flex: 1,
   },
   amountLabel: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
+    fontSize: 14,
     marginBottom: 4,
   },
   amountText: {
-    ...FONTS.h3,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   divider: {
     width: 1,
-    height: "100%",
-    backgroundColor: COLORS.gray,
-    marginHorizontal: SIZES.padding,
+    height: 40,
+    marginHorizontal: 16,
   },
   chartSection: {
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius * 1.5,
-    padding: SIZES.padding * 1.2,
-    marginBottom: SIZES.padding,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
   },
   chartContainer: {
     alignItems: "center",
-    marginTop: SIZES.padding,
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding / 2,
-  },
-  pieChartContainer: {
-    alignItems: "center",
-    marginTop: SIZES.padding,
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: SIZES.padding / 2,
-  },
-  timeframeContainer: {
-    marginTop: SIZES.padding,
-    alignItems: "center",
-  },
-  timeframeSelector: {
-    flexDirection: "row",
-    backgroundColor: COLORS.lightGray,
-    borderRadius: 20,
-    padding: 2,
-  },
-  timeframeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  activeTimeframe: {
-    backgroundColor: COLORS.white,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  timeframeText: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
-  },
-  activeTimeframeText: {
-    color: COLORS.primary,
-    fontFamily: "Inter-Medium",
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: SIZES.padding,
-  },
-  sectionTitle: {
-    ...FONTS.h3,
-    color: COLORS.black,
-    fontWeight: "600",
+    marginBottom: 16,
   },
   chart: {
     marginVertical: 8,
-    borderRadius: SIZES.radius,
+    borderRadius: 16,
   },
-  transactionsSection: {
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius * 1.5,
-    padding: SIZES.padding * 1.2,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+  timeframeContainer: {
+    marginTop: 8,
   },
-  viewAllButton: {
+  timeframeSelector: {
+    flexDirection: "row",
+    backgroundColor: "rgba(0,0,0,0.05)",
+    borderRadius: 8,
+    padding: 4,
+  },
+  timeframeButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  timeframeText: {
+    fontSize: 14,
+  },
+  pieChartContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  viewAllText: {
-    ...FONTS.body4,
-    color: COLORS.primary,
-    marginRight: 4,
-  },
-  transactionsList: {
-    marginTop: 8,
-  },
   legendContainer: {
-    marginTop: SIZES.padding,
-    width: "100%",
-    paddingHorizontal: SIZES.padding,
+    flex: 1,
+    marginLeft: 16,
   },
   legendItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   legendColor: {
     width: 12,
@@ -479,14 +490,41 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   legendText: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
     flex: 1,
+    fontSize: 14,
   },
   legendAmount: {
-    ...FONTS.body4,
-    color: COLORS.black,
-    fontWeight: "500",
+    fontSize: 14,
+  },
+  transactionsSection: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  viewAllButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  viewAllText: {
+    fontSize: 14,
+    marginRight: 4,
+  },
+  transactionsList: {
+    marginTop: 8,
+  },
+  loadingText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 32,
+  },
+  noTransactionsText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 32,
   },
 });
 

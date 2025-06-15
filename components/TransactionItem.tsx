@@ -1,7 +1,8 @@
-import { COLORS, FONTS } from "@/constants/theme";
+import { useTheme } from "@/context/ThemeContext";
 import { Transaction } from "@/types";
 import { getTransactionIconName } from "@/utils/transactionIcons";
 import { format } from "date-fns";
+import { IndianRupee } from "lucide-react-native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -14,6 +15,7 @@ const TransactionItem = ({
   transaction,
   isLast = false,
 }: TransactionItemProps) => {
+  const { colors } = useTheme();
   const { category, amount, date, type, title } = transaction;
 
   // Get the icon for this transaction category
@@ -21,7 +23,10 @@ const TransactionItem = ({
 
   return (
     <TouchableOpacity
-      style={[styles.container, !isLast && styles.borderBottom]}
+      style={[
+        styles.container,
+        !isLast && [styles.borderBottom, { borderBottomColor: colors.border }],
+      ]}
       activeOpacity={0.7}
     >
       <View
@@ -29,33 +34,38 @@ const TransactionItem = ({
           styles.iconContainer,
           {
             backgroundColor:
-              type === "income"
-                ? "rgba(16, 185, 129, 0.1)"
-                : "rgba(239, 68, 68, 0.1)",
+              type === "income" ? colors.primaryLight : colors.errorLight,
           },
         ]}
       >
         <MaterialCommunityIcons
           name={iconName}
           size={24}
-          color={COLORS.primary}
+          color={type === "income" ? colors.black : colors.black}
         />
-
-        {/* <Icon size={20} color={type === 'income' ? COLORS.success : COLORS.expense} /> */}
       </View>
 
       <View style={styles.detailsContainer}>
-        <Text style={styles.title}>{title || category}</Text>
-        <Text style={styles.date}>{format(new Date(date), "MMM d, yyyy")}</Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
+          {title || category}
+        </Text>
+        <Text style={[styles.date, { color: colors.textPrimary }]}>
+          {format(new Date(date), "MMM d, yyyy")}
+        </Text>
       </View>
 
       <Text
         style={[
           styles.amount,
-          { color: type === "income" ? COLORS.success : COLORS.expense },
+          { color: type === "income" ? colors.primary : colors.error },
         ]}
       >
-        {type === "income" ? "+" : "-"}${amount.toFixed(2)}
+        {type === "income" ? "+" : "-"}{" "}
+        <IndianRupee
+          size={12}
+          color={type === "income" ? colors.primary : colors.error}
+        />
+        {amount.toFixed(2)}
       </Text>
     </TouchableOpacity>
   );
@@ -69,7 +79,6 @@ const styles = StyleSheet.create({
   },
   borderBottom: {
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
   },
   iconContainer: {
     width: 40,
@@ -83,16 +92,14 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   title: {
-    ...FONTS.body3,
-    color: COLORS.black,
+    fontSize: 16,
   },
   date: {
-    ...FONTS.body4,
-    color: COLORS.grayDark,
+    fontSize: 12,
     marginTop: 2,
   },
   amount: {
-    ...FONTS.h4,
+    fontSize: 16,
     fontFamily: "Inter-Medium",
   },
 });

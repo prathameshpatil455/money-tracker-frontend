@@ -1,10 +1,12 @@
-import { COLORS } from "@/constants/theme";
+import { COLORS } from "@/constants/Colors";
+import { useTheme } from "@/context/ThemeContext";
 import { Tabs } from "expo-router";
 import { useRef } from "react";
 import { Animated, Platform, StyleSheet } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 export default function TabLayout() {
+  const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const animateIcon = () => {
@@ -23,8 +25,8 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.grayDark,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textPrimary,
         tabBarIcon: ({ color, size, focused }) => {
           let iconName = "";
 
@@ -73,7 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingTop: 4,
     height: 70,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.cardBackground,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
@@ -84,6 +86,5 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontFamily: "Inter-Medium",
     fontSize: 12,
-    // paddingBottom: 4,
   },
 });

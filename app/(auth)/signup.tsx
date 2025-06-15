@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/Colors";
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -16,6 +16,7 @@ import { useAuthStore } from "../../store/auth";
 import styles from "../../styles/signup.styles";
 
 export default function Signup() {
+  const { colors } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -78,13 +79,13 @@ export default function Signup() {
                   <Ionicons
                     name="person-outline"
                     size={24}
-                    color={COLORS.primary}
+                    color={colors.primary}
                     style={styles.inputIcon}
                   />
                   <TextInput
                     style={styles.input}
                     placeholder="Enter your username"
-                    placeholderTextColor={COLORS.placeholderText}
+                    placeholderTextColor={colors.placeholderText}
                     onChangeText={setUserName}
                     value={userName}
                     autoCapitalize="none"
@@ -99,13 +100,13 @@ export default function Signup() {
                   <Ionicons
                     name="mail-outline"
                     size={24}
-                    color={COLORS.primary}
+                    color={colors.primary}
                     style={styles.inputIcon}
                   />
                   <TextInput
                     style={styles.input}
                     placeholder="Enter your email"
-                    placeholderTextColor={COLORS.placeholderText}
+                    placeholderTextColor={colors.placeholderText}
                     onChangeText={setEmail}
                     value={email}
                     autoCapitalize="none"
@@ -120,14 +121,14 @@ export default function Signup() {
                   <Ionicons
                     name="lock-closed-outline"
                     size={24}
-                    color={COLORS.primary}
+                    color={colors.primary}
                     style={styles.inputIcon}
                   />
 
                   <TextInput
                     style={styles.input}
                     placeholder="*******"
-                    placeholderTextColor={COLORS.placeholderText}
+                    placeholderTextColor={colors.placeholderText}
                     secureTextEntry={!showPassword}
                     onChangeText={setPassword}
                     value={password}
@@ -140,7 +141,7 @@ export default function Signup() {
                     <Ionicons
                       name={showPassword ? "eye-outline" : "eye-off-outline"}
                       size={20}
-                      color={COLORS.primary}
+                      color={colors.primary}
                       style={styles.inputIcon}
                     />
                   </TouchableOpacity>

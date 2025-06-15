@@ -24,17 +24,17 @@ const styles = StyleSheet.create({
     height: width * 0.75,
   },
   card: {
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    marginTop: -24,
+    // backgroundColor: COLORS.cardBackground,
+    // borderRadius: 16,
+    // padding: 24,
+    // shadowColor: COLORS.black,
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 8,
+    // elevation: 4,
+    // borderWidth: 2,
+    // borderColor: COLORS.border,
+    // marginTop: -24,
   },
   header: {
     alignItems: "center",
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginBottom: 16,
+    padding: 8,
   },
   inputGroup: {
     marginBottom: 20,
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: COLORS.textSecondary,
+    color: COLORS.textPrimary,
     marginRight: 5,
   },
   link: {
