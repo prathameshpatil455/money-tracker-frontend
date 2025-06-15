@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuthStore } from "@/store/auth";
+import { useRouter } from "expo-router";
 import {
   Bell,
   ChevronRight,
@@ -22,6 +24,17 @@ import {
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
+  const { logout, user } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace("/(auth)");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   const profileSections = [
     {
@@ -99,18 +112,20 @@ const ProfileScreen = () => {
         >
           <Image
             source={{
-              uri: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300",
+              uri: `https://ui-avatars.com/api/?name=${
+                user?.name || "User"
+              }&background=random&color=fff&size=200`,
             }}
             style={styles.profileImage}
           />
           <View style={styles.profileInfo}>
             <Text style={[styles.profileName, { color: colors.textPrimary }]}>
-              John Doe
+              {user?.name || "User"}
             </Text>
             <Text
               style={[styles.profileEmail, { color: colors.textSecondary }]}
             >
-              john.doe@example.com
+              {user?.email || "user@example.com"}
             </Text>
           </View>
           <TouchableOpacity
@@ -123,42 +138,6 @@ const ProfileScreen = () => {
               Edit
             </Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Stats Overview */}
-        <View
-          style={[styles.statsCard, { backgroundColor: colors.cardBackground }]}
-        >
-          <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
-              $2,450
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-              Income
-            </Text>
-          </View>
-          <View
-            style={[styles.statDivider, { backgroundColor: colors.border }]}
-          />
-          <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
-              $1,870
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-              Expenses
-            </Text>
-          </View>
-          <View
-            style={[styles.statDivider, { backgroundColor: colors.border }]}
-          />
-          <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
-              $580
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-              Balance
-            </Text>
-          </View>
         </View>
 
         {/* Profile Sections */}
@@ -207,6 +186,7 @@ const ProfileScreen = () => {
             styles.logoutButton,
             { backgroundColor: colors.cardBackground },
           ]}
+          onPress={handleLogout}
         >
           <LogOut size={20} color={colors.error} />
           <Text style={[styles.logoutText, { color: colors.error }]}>
@@ -226,6 +206,7 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 80,
   },
   scrollContent: {
     padding: 16,
