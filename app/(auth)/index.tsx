@@ -1,7 +1,8 @@
 import { COLORS } from "@/constants/Colors";
+import { useNotificationStore } from "@/store/notificationStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -16,13 +17,24 @@ import {
 import { useAuthStore } from "../../store/auth";
 import styles from "../../styles/login.styles";
 
-export default function LoginScreen() {
+const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { login, error, clearError } = useAuthStore();
+  const { expoPushToken, registerForPushNotifications, sendPushNotification } =
+    useNotificationStore();
+
+  sendPushNotification("Transaction Added 💰", "You added ₹1000 to Income", {
+    type: "income",
+    amount: 1000,
+  });
+
+  useEffect(() => {
+    registerForPushNotifications();
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -65,73 +77,71 @@ export default function LoginScreen() {
 
         <View style={styles.card}>
           <View style={styles.formContainer}>
-            <>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email</Text>
-                <View style={styles.inputContainer}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="mail-outline"
+                  size={24}
+                  color={COLORS.primary}
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your email"
+                  placeholderTextColor={COLORS.placeholderText}
+                  onChangeText={setEmail}
+                  value={email}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Password</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={24}
+                  color={COLORS.primary}
+                  style={styles.inputIcon}
+                />
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor={COLORS.placeholderText}
+                  secureTextEntry={!showPassword}
+                  onChangeText={setPassword}
+                  value={password}
+                />
+
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.eyeIcon}
+                >
                   <Ionicons
-                    name="mail-outline"
-                    size={24}
+                    name={showPassword ? "eye-outline" : "eye-off-outline"}
+                    size={20}
                     color={COLORS.primary}
                     style={styles.inputIcon}
                   />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter your email"
-                    placeholderTextColor={COLORS.placeholderText}
-                    onChangeText={setEmail}
-                    value={email}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                  />
-                </View>
+                </TouchableOpacity>
               </View>
+            </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Password</Text>
-                <View style={styles.inputContainer}>
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={24}
-                    color={COLORS.primary}
-                    style={styles.inputIcon}
-                  />
-
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor={COLORS.placeholderText}
-                    secureTextEntry={!showPassword}
-                    onChangeText={setPassword}
-                    value={password}
-                  />
-
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeIcon}
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye-outline" : "eye-off-outline"}
-                      size={20}
-                      color={COLORS.primary}
-                      style={styles.inputIcon}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                onPress={handleLogin}
-                style={styles.button}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Login</Text>
-                )}
-              </TouchableOpacity>
-            </>
+            <TouchableOpacity
+              onPress={handleLogin}
+              style={styles.button}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Login</Text>
+              )}
+            </TouchableOpacity>
 
             {/* footer */}
             <View style={styles.footer}>
@@ -147,4 +157,6 @@ export default function LoginScreen() {
       </View>
     </KeyboardAvoidingView>
   );
-}
+};
+
+export default LoginScreen;

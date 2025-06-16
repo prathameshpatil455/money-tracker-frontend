@@ -1,8 +1,18 @@
 import { COLORS } from "@/constants/Colors";
 import { useAuthStore } from "@/store/auth";
+import * as Notifications from "expo-notifications";
 import { Link, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+
+// This allows the notification to show even when the app is foregrounded
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function Index() {
   const { checkToken, user, token, error, loading } = useAuthStore();
