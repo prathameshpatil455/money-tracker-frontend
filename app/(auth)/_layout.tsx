@@ -1,5 +1,15 @@
 import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function AuthLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  const colorScheme = useColorScheme();
+
+  return (
+    <SafeAreaProvider>
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+      <Stack screenOptions={{ headerShown: false }} />;
+    </SafeAreaProvider>
+  );
 }

@@ -300,7 +300,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingBottom: 120,
-    padding: 16,
+    // padding: 16,
+    paddingHorizontal: 16,
   },
   scrollContent: {
     paddingBottom: 20,
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 16,
     padding: 16,
-    marginTop: 16,
+    marginTop: 8,
   },
   sectionTitle: {
     fontSize: 18,
@@ -387,7 +388,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    zIndex: 1000,
+    // zIndex: 1000,
   },
   modalOverlay: {
     flex: 1,

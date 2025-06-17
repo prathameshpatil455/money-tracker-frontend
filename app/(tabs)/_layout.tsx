@@ -23,7 +23,7 @@ export default function TabLayout() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={["top"]}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <Tabs
           screenOptions={({ route }) => ({
             tabBarShowLabel: true,

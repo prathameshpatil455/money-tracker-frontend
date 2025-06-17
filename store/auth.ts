@@ -42,6 +42,7 @@ type AuthState = {
   logout: () => Promise<void>;
   checkToken: () => Promise<void>;
   clearError: () => void;
+  updateUsername: (newName: string) => Promise<boolean>;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -113,6 +114,35 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Registration failed";
+      set({ error: errorMessage });
+      return false;
+    }
+  },
+
+  updateUsername: async (newName: string) => {
+    try {
+      set({ error: null });
+      const res = await axiosInstance.put<AuthResponse>(
+        ENDPOINTS.AUTH.UPDATE_USER,
+        {
+          name: newName,
+        }
+      );
+
+      set((state) => ({
+        user: state.user
+          ? {
+              ...state.user,
+              name: res.data.name,
+            }
+          : null,
+        error: null,
+      }));
+
+      return true;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update username";
       set({ error: errorMessage });
       return false;
     }

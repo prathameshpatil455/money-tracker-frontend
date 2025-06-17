@@ -5,13 +5,17 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "../../store/auth";
 import styles from "../../styles/signup.styles";
 
@@ -36,7 +40,7 @@ export default function Signup() {
       clearError();
       const success = await register({
         name: userName,
-        email,
+        email: email.toLowerCase().trim(),
         password,
       });
 
@@ -61,147 +65,154 @@ export default function Signup() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView
+      style={[
+        localStyles.mainContainer,
+        { backgroundColor: colors.background },
+      ]}
+      edges={["top"]}
     >
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Money Mate</Text>
-            <Text style={styles.subtitle}>Best way to manage your money</Text>
-          </View>
-          <View style={styles.formContainer}>
-            <>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>UserName</Text>
-                <View style={styles.inputContainer}>
-                  <Ionicons
-                    name="person-outline"
-                    size={24}
-                    color={colors.primary}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter your username"
-                    placeholderTextColor={colors.placeholderText}
-                    onChangeText={setUserName}
-                    value={userName}
-                    autoCapitalize="none"
-                    keyboardType="default"
-                  />
-                </View>
+      <KeyboardAvoidingView
+        style={localStyles.keyboardView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={localStyles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <View style={[styles.container, localStyles.contentContainer]}>
+            <View style={styles.card}>
+              <View style={styles.header}>
+                <Text style={styles.title}>WalletWise</Text>
+                <Text style={styles.subtitle}>
+                  Best way to manage your money
+                </Text>
               </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email</Text>
-                <View style={styles.inputContainer}>
-                  <Ionicons
-                    name="mail-outline"
-                    size={24}
-                    color={colors.primary}
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter your email"
-                    placeholderTextColor={colors.placeholderText}
-                    onChangeText={setEmail}
-                    value={email}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                  />
-                </View>
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Password</Text>
-                <View style={styles.inputContainer}>
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={24}
-                    color={colors.primary}
-                    style={styles.inputIcon}
-                  />
-
-                  <TextInput
-                    style={styles.input}
-                    placeholder="*******"
-                    placeholderTextColor={colors.placeholderText}
-                    secureTextEntry={!showPassword}
-                    onChangeText={setPassword}
-                    value={password}
-                  />
-
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeIcon}
-                  >
+              <View style={styles.formContainer}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>UserName</Text>
+                  <View style={styles.inputContainer}>
                     <Ionicons
-                      name={showPassword ? "eye-outline" : "eye-off-outline"}
-                      size={20}
+                      name="person-outline"
+                      size={24}
                       color={colors.primary}
                       style={styles.inputIcon}
                     />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your username"
+                      placeholderTextColor={colors.placeholderText}
+                      onChangeText={setUserName}
+                      value={userName}
+                      autoCapitalize="none"
+                      keyboardType="default"
+                      returnKeyType="next"
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Email</Text>
+                  <View style={styles.inputContainer}>
+                    <Ionicons
+                      name="mail-outline"
+                      size={24}
+                      color={colors.primary}
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your email"
+                      placeholderTextColor={colors.placeholderText}
+                      onChangeText={setEmail}
+                      value={email}
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      returnKeyType="next"
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Password</Text>
+                  <View style={styles.inputContainer}>
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={24}
+                      color={colors.primary}
+                      style={styles.inputIcon}
+                    />
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder="*******"
+                      placeholderTextColor={colors.placeholderText}
+                      secureTextEntry={!showPassword}
+                      onChangeText={setPassword}
+                      value={password}
+                      returnKeyType="done"
+                      onSubmitEditing={Keyboard.dismiss}
+                    />
+
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={styles.eyeIcon}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye-outline" : "eye-off-outline"}
+                        size={20}
+                        color={colors.primary}
+                        style={styles.inputIcon}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  onPress={handleSignUp}
+                  style={styles.button}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.buttonText}>Register</Text>
+                  )}
+                </TouchableOpacity>
+
+                <View style={styles.footer}>
+                  <Text style={styles.footerText}>
+                    Already have an account?
+                  </Text>
+                  <TouchableOpacity onPress={() => router.back()}>
+                    <Text style={styles.link}>Login</Text>
                   </TouchableOpacity>
                 </View>
               </View>
-
-              <TouchableOpacity
-                onPress={handleSignUp}
-                style={styles.button}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Register</Text>
-                )}
-              </TouchableOpacity>
-            </>
-
-            {/* footer */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Already have an account?</Text>
-              <TouchableOpacity onPress={() => router.back()}>
-                <Text style={styles.link}>Login</Text>
-              </TouchableOpacity>
             </View>
           </View>
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 24,
-//     justifyContent: "center",
-//     backgroundColor: "#fff",
-//   },
-//   title: {
-//     fontSize: 28,
-//     fontWeight: "600",
-//     marginBottom: 24,
-//     textAlign: "center",
-//   },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: "#ddd",
-//     borderRadius: 8,
-//     padding: 12,
-//     marginBottom: 12,
-//   },
-//   error: {
-//     color: "red",
-//     marginBottom: 8,
-//   },
-//   link: {
-//     color: "#4169e1",
-//     marginTop: 20,
-//     textAlign: "center",
-//   },
-// });
+const localStyles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingVertical: 20,
+  },
+});

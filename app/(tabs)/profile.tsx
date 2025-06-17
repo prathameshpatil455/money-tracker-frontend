@@ -13,19 +13,26 @@ import {
   Shield,
   User,
 } from "lucide-react-native";
+import { useState } from "react";
 import {
+  Alert,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
-  const { logout, user } = useAuthStore();
+  const { logout, user, updateUsername } = useAuthStore();
   const router = useRouter();
+  const [imageError, setImageError] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState(user?.name || "");
 
   const handleLogout = async () => {
     try {
@@ -33,6 +40,26 @@ const ProfileScreen = () => {
       router.replace("/(auth)");
     } catch (error) {
       console.error("Logout error:", error);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
+  const handleUpdateUsername = async () => {
+    if (!newName.trim()) {
+      Alert.alert("Error", "Name cannot be empty");
+      return;
+    }
+
+    const success = await updateUsername(newName.trim());
+    if (success) {
+      setIsEditing(false);
     }
   };
 
@@ -96,7 +123,7 @@ const ProfileScreen = () => {
     },
   ];
 
-  const img = `https://api.dicebear.com/9.x/adventurer/png?seed=prathamesh%20`;
+  console.log(user?.userImage);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -112,36 +139,55 @@ const ProfileScreen = () => {
             { backgroundColor: colors.cardBackground },
           ]}
         >
-          <Image
-            source={{
-              // uri: `https://ui-avatars.com/api/?name=${
-              //   user?.name || "User"
-              // }&background=random&color=fff&size=200`,
-              // uri: `${user?.userImage}`,
-              uri: img,
-            }}
-            style={styles.profileImage}
-          />
           <View style={styles.profileInfo}>
-            <Text style={[styles.profileName, { color: colors.textPrimary }]}>
-              {user?.name || "User"}
-            </Text>
-            <Text
-              style={[styles.profileEmail, { color: colors.textSecondary }]}
-            >
-              {user?.email || "user@example.com"}
-            </Text>
+            <View style={styles.imageContainer}>
+              {!imageError && user?.userImage ? (
+                <Image
+                  source={{ uri: user.userImage }}
+                  style={styles.profileImage}
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <View
+                  style={[
+                    styles.initialsContainer,
+                    { backgroundColor: colors.primary },
+                  ]}
+                >
+                  <Text style={styles.initialsText}>
+                    {getInitials(user?.name || "User")}
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.profileDetails}>
+              <View style={styles.nameContainer}>
+                <Text
+                  style={[styles.profileName, { color: colors.textPrimary }]}
+                >
+                  {user?.name}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setIsEditing(true)}
+                  style={[
+                    styles.editButton,
+                    { backgroundColor: colors.primary },
+                  ]}
+                >
+                  <Text
+                    style={[styles.editButtonText, { color: colors.white }]}
+                  >
+                    Edit
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <Text
+                style={[styles.profileEmail, { color: colors.textPrimary }]}
+              >
+                {user?.email}
+              </Text>
+            </View>
           </View>
-          <TouchableOpacity
-            style={[
-              styles.editButton,
-              { backgroundColor: colors.inputBackground },
-            ]}
-          >
-            <Text style={[styles.editButtonText, { color: colors.primary }]}>
-              Edit
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Profile Sections */}
@@ -203,6 +249,60 @@ const ProfileScreen = () => {
           App Version 1.0.0
         </Text>
       </ScrollView>
+
+      <Modal
+        visible={isEditing}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsEditing(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: colors.background },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+              Edit Username
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  color: colors.textPrimary,
+                  borderColor: colors.border,
+                  backgroundColor: colors.cardBackground,
+                },
+              ]}
+              value={newName}
+              onChangeText={setNewName}
+              placeholder="Enter new username"
+              placeholderTextColor={colors.textSecondary}
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: colors.error }]}
+                onPress={() => {
+                  setIsEditing(false);
+                  setNewName("");
+                }}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={handleUpdateUsername}
+              >
+                <Text style={styles.modalButtonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -213,7 +313,8 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 32,
   },
   profileCard: {
@@ -228,59 +329,113 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  profileImage: {
+  profileInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  imageContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#ababab",
+    overflow: "hidden",
+    marginRight: 16,
   },
-  profileInfo: {
+  profileImage: {
+    width: "100%",
+    height: "100%",
+  },
+  profileDetails: {
     flex: 1,
-    marginLeft: 16,
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
   },
   profileName: {
     fontSize: 18,
     fontWeight: "bold",
+    textTransform: "capitalize",
   },
   profileEmail: {
     fontSize: 14,
-    marginTop: 4,
+    marginTop: 6,
   },
   editButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   editButtonText: {
     fontSize: 14,
-    fontFamily: "Inter-Medium",
+    fontWeight: "500",
   },
-  statsCard: {
+  logoutButton: {
     flexDirection: "row",
-    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
     padding: 16,
-    marginBottom: 16,
+    borderRadius: 16,
+    marginTop: 16,
+    marginBottom: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
   },
-  statItem: {
+  logoutText: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+  versionText: {
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 8,
+  },
+  modalOverlay: {
     flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
     alignItems: "center",
   },
-  statValue: {
-    fontSize: 18,
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    borderRadius: 12,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
     fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
   },
-  statLabel: {
-    fontSize: 14,
-    marginTop: 4,
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 20,
+    fontSize: 16,
   },
-  statDivider: {
-    width: 1,
-    height: "100%",
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
   section: {
     marginBottom: 16,
@@ -318,29 +473,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 12,
   },
-  logoutButton: {
-    flexDirection: "row",
-    alignItems: "center",
+  initialsContainer: {
+    width: "100%",
+    height: "100%",
     justifyContent: "center",
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 16,
-    marginBottom: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    alignItems: "center",
   },
-  logoutText: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  versionText: {
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 8,
+  initialsText: {
+    fontSize: 40,
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

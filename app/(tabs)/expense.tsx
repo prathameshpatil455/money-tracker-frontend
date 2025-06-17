@@ -169,7 +169,7 @@ const ExpenseScreen = () => {
                 style={styles.closeButton}
                 onPress={() => setShowModal(false)}
               >
-                <X size={24} color={colors.textSecondary} />
+                <X size={24} color={colors.textPrimary} />
               </TouchableOpacity>
             </View>
 
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingBottom: 120,
-    padding: 16,
+    paddingHorizontal: 16,
   },
   scrollContent: {
     paddingBottom: 20,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 4,
   },
   amountInput: {
     flex: 1,
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 4,
   },
   noteInput: {
     flex: 1,
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 16,
     padding: 16,
-    marginTop: 16,
+    marginTop: 8,
   },
   sectionTitle: {
     fontSize: 18,

@@ -243,7 +243,15 @@ const Dashboard = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header title="Dashboard" />
+      {/* <Header title="Dashboard" /> */}
+      <View style={styles.greetingContainer}>
+        <Text style={[styles.greetingText, { color: colors.textPrimary }]}>
+          Hey,
+        </Text>
+        <Text style={[styles.userNameText, { color: colors.primary }]}>
+          {user?.name}
+        </Text>
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -844,6 +852,23 @@ const styles = StyleSheet.create({
     width: 1,
     height: "100%",
     // marginHorizontal: 2,
+  },
+  greetingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  greetingText: {
+    fontSize: 24,
+    fontWeight: "500",
+  },
+  userNameText: {
+    fontSize: 24,
+    fontWeight: "700",
+    textTransform: "capitalize",
   },
 });
 

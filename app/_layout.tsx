@@ -57,7 +57,10 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <View style={{ flex: 1, backgroundColor }} onLayout={onLayoutRootView}>
-        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+        <StatusBar
+          style={colorScheme === "dark" ? "light" : "dark"}
+          backgroundColor="white"
+        />
         <Stack
           screenOptions={{
             headerStyle: {
