@@ -1,6 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { Bell, Search } from "lucide-react-native";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 interface HeaderProps {
   title: string;
@@ -12,7 +11,7 @@ const Header = ({ title }: HeaderProps) => {
   return (
     <View style={styles.container}>
       <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
-      <View style={styles.actionsContainer}>
+      {/* <View style={styles.actionsContainer}>
         <TouchableOpacity
           style={[
             styles.iconButton,
@@ -38,7 +37,7 @@ const Header = ({ title }: HeaderProps) => {
             ]}
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 };

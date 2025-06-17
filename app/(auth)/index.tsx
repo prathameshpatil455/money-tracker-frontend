@@ -2,7 +2,7 @@ import { COLORS } from "@/constants/Colors";
 import { useNotificationStore } from "@/store/notificationStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -27,14 +27,18 @@ const LoginScreen = () => {
   const { expoPushToken, registerForPushNotifications, sendPushNotification } =
     useNotificationStore();
 
-  sendPushNotification("Transaction Added 💰", "You added ₹1000 to Income", {
-    type: "income",
-    amount: 1000,
-  });
+  // sendPushNotification(
+  //   "Transaction removed 💰",
+  //   "You added ₹199000 to Income",
+  //   {
+  //     type: "income",
+  //     amount: 1000,
+  //   }
+  // );
 
-  useEffect(() => {
-    registerForPushNotifications();
-  }, []);
+  // useEffect(() => {
+  //   registerForPushNotifications();
+  // }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {

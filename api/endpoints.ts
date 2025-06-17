@@ -6,6 +6,8 @@ export const ENDPOINTS = {
     REGISTER: "/api/auth/register",
     VERIFY: "/api/auth/verify",
     LOGOUT: "/api/auth/logout",
+    UPDATE_PUSH_TOKEN: "/api/auth/update-token",
+    UPDATE_USER: "/api/auth/update-name",
   },
 
   // User endpoints

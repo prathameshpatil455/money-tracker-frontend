@@ -3,12 +3,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import axiosInstance from "../api/axiosInstance";
 import { ENDPOINTS } from "../api/endpoints";
+import { useNotificationStore } from "./notificationStore";
 
 // Types
 interface User {
   _id: string;
   name: string;
   email: string;
+  userImage: string;
 }
 
 interface AuthResponse {
@@ -16,6 +18,7 @@ interface AuthResponse {
   email: string;
   name: string;
   token: string;
+  userImage: string;
 }
 
 interface LoginCredentials {
@@ -55,6 +58,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
       });
 
+      console.log(res.data, "user data");
+
       await AsyncStorage.setItem("token", res.data.token);
       set({
         token: res.data.token,
@@ -62,13 +67,20 @@ export const useAuthStore = create<AuthState>((set) => ({
           _id: res.data._id,
           name: res.data.name,
           email: res.data.email,
+          userImage: res.data.userImage,
         },
         error: null,
       });
+
+      // Register for push notifications after successful login
+      await useNotificationStore.getState().registerForPushNotifications();
+
       return true;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
+
+      console.log(error, "hello");
       set({ error: errorMessage });
       return false;
     }
@@ -93,6 +105,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           _id: res.data._id,
           name: res.data.name,
           email: res.data.email,
+          userImage: res.data.userImage,
         },
         error: null,
       });
@@ -130,6 +143,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             _id: res.data._id,
             name: res.data.name,
             email: res.data.email,
+            userImage: res.data.userImage,
           },
           loading: false,
           error: null,

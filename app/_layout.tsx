@@ -1,63 +1,79 @@
-import SafeScreen from "@/components/SafeScreen";
-import { ThemeProvider } from "@/context/ThemeContext";
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
-} from "@expo-google-fonts/inter";
-import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
+import { useFonts } from "expo-font";
+import * as Notifications from "expo-notifications";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { useColorScheme, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useAuthStore } from "../store/auth";
+import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../hooks/useNotifications";
+import { useThemeColor } from "../hooks/useThemeColor";
 
-// Prevent auto-hide of splash
+// Configure notifications
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
+// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const segments = useSegments();
-  const router = useRouter();
-  const { user, token, error, loading, checkToken } = useAuthStore();
+  const colorScheme = useColorScheme();
+  const { isAuthenticated } = useAuth();
+  const { requestNotificationPermissions } = useNotifications();
+  const backgroundColor = useThemeColor("background");
+  const textColor = useThemeColor("text");
+
   const [fontsLoaded, fontError] = useFonts({
-    "Inter-Regular": Inter_400Regular,
-    "Inter-Medium": Inter_500Medium,
-    "Inter-SemiBold": Inter_600SemiBold,
-    "Inter-Bold": Inter_700Bold,
+    // "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+    // "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
+    // "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
+    "SpaceMono-Regular": require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // Load token once
   useEffect(() => {
-    checkToken();
-  }, []);
-
-  // Hide splash when everything is ready
-  useEffect(() => {
-    if ((fontsLoaded || fontError) && !loading) {
-      SplashScreen.hideAsync();
+    if (isAuthenticated) {
+      requestNotificationPermissions();
     }
-  }, [fontsLoaded, fontError, loading]);
+  }, [isAuthenticated]);
 
-  // Wait until fonts and auth status are ready
-  if ((!fontsLoaded && !fontError) || loading) return null;
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
-    <ThemeProvider>
-      <SafeAreaProvider>
-        <SafeScreen>
-          <Stack
-            screenOptions={{ headerShown: false }}
-            // initialRouteName="(tabs)"
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="+not-found" options={{ title: "Oops!" }} />
-          </Stack>
-          <StatusBar style="light" />
-        </SafeScreen>
-      </SafeAreaProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <View style={{ flex: 1, backgroundColor }} onLayout={onLayoutRootView}>
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor,
+            },
+            headerTintColor: textColor,
+            headerTitleStyle: {
+              fontFamily: "SpaceMono-Regular",
+            },
+            contentStyle: {
+              backgroundColor,
+            },
+            headerShown: false,
+          }}
+        />
+      </View>
+    </SafeAreaProvider>
   );
 }

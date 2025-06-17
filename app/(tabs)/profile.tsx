@@ -96,6 +96,8 @@ const ProfileScreen = () => {
     },
   ];
 
+  const img = `https://api.dicebear.com/9.x/adventurer/png?seed=prathamesh%20`;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header title="Profile" />
@@ -112,9 +114,11 @@ const ProfileScreen = () => {
         >
           <Image
             source={{
-              uri: `https://ui-avatars.com/api/?name=${
-                user?.name || "User"
-              }&background=random&color=fff&size=200`,
+              // uri: `https://ui-avatars.com/api/?name=${
+              //   user?.name || "User"
+              // }&background=random&color=fff&size=200`,
+              // uri: `${user?.userImage}`,
+              uri: img,
             }}
             style={styles.profileImage}
           />
@@ -228,6 +232,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
+    backgroundColor: "#ababab",
   },
   profileInfo: {
     flex: 1,

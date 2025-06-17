@@ -1,9 +1,11 @@
 import { COLORS } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useRef } from "react";
 import { Animated, Platform, StyleSheet } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { colors } = useTheme();
@@ -19,56 +21,65 @@ export default function TabLayout() {
   };
 
   return (
-    <Tabs
-      screenOptions={({ route }) => ({
-        tabBarShowLabel: true,
-        headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabBarLabel,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textPrimary,
-        tabBarIcon: ({ color, size, focused }) => {
-          let iconName = "";
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <StatusBar style="dark" />
+        <Tabs
+          screenOptions={({ route }) => ({
+            tabBarShowLabel: true,
+            headerShown: false,
+            tabBarStyle: styles.tabBar,
+            tabBarLabelStyle: styles.tabBarLabel,
+            tabBarActiveTintColor: colors.primary,
+            tabBarInactiveTintColor: colors.textPrimary,
+            tabBarIcon: ({ color, size, focused }) => {
+              let iconName: keyof typeof Ionicons.glyphMap = "home";
 
-          switch (route.name) {
-            case "index":
-              iconName = "grid-outline";
-              break;
-            case "income":
-              iconName = "trending-up-outline";
-              break;
-            case "expense":
-              iconName = "trending-down-outline";
-              break;
-            case "profile":
-              iconName = "person-outline";
-              break;
-          }
+              switch (route.name) {
+                case "index":
+                  iconName = "grid";
+                  break;
+                case "income":
+                  iconName = "trending-up";
+                  break;
+                case "expense":
+                  iconName = "trending-down";
+                  break;
+                case "profile":
+                  iconName = "person";
+                  break;
+              }
 
-          if (focused) animateIcon();
+              if (focused) animateIcon();
 
-          return (
-            <Animated.View
-              style={{ transform: [{ scale: focused ? scaleAnim : 1 }] }}
-            >
-              <Ionicons name={iconName} size={size} color={color} />
-            </Animated.View>
-          );
-        },
-      })}
-    >
-      <Tabs.Screen name="index" options={{ title: "Dashboard" }} />
-      <Tabs.Screen name="income" options={{ title: "Income" }} />
-      <Tabs.Screen name="expense" options={{ title: "Expense" }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
-    </Tabs>
+              return (
+                <Animated.View
+                  style={{ transform: [{ scale: focused ? scaleAnim : 1 }] }}
+                >
+                  <Ionicons name={iconName} size={size} color={color} />
+                </Animated.View>
+              );
+            },
+          })}
+        >
+          <Tabs.Screen name="index" options={{ title: "Dashboard" }} />
+          <Tabs.Screen name="income" options={{ title: "Income" }} />
+          <Tabs.Screen name="expense" options={{ title: "Expense" }} />
+          <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+        </Tabs>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   tabBar: {
     position: "absolute",
-    bottom: 16,
+    bottom: Platform.OS === "ios" ? 20 : 16,
     left: 16,
     right: 16,
     marginHorizontal: 12,

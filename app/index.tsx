@@ -8,7 +8,7 @@ import { Image, StyleSheet, Text, View } from "react-native";
 // This allows the notification to show even when the app is foregrounded
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
